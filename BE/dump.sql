@@ -13,7 +13,7 @@ CREATE TABLE todos (
     user_id UUID NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    status VARCHAR(20) NOT NULL DEFAULT 'pending',  
+    status VARCHAR(20) NOT NULL DEFAULT 'pending',
     priority INTEGER CHECK (priority BETWEEN 1 AND 5),
     due_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

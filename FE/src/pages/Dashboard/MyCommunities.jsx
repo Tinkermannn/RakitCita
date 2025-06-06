@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import apiClient from '../../services/api';
 import CommunityCard from '../../components/CommunityCard/CommunityCard';
 import Loading from '../../components/Loading/Loading';
+import ReadableText from '../../components/ReadableText/ReadableText';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import { PlusCircle } from 'react-feather';
@@ -36,13 +37,30 @@ export default function MyCommunities({ user }) {
         if (communities.length === 0) {
             return (
                  <div className="text-center py-10">
-                    <p className="text-gray-500 mb-4">Anda belum bergabung dengan komunitas apapun.</p>
+                    <ReadableText 
+                        tag="p" 
+                        className="text-gray-500 mb-4"
+                        textToRead="Anda belum bergabung dengan komunitas apapun"
+                    >
+                        Anda belum bergabung dengan komunitas apapun.
+                    </ReadableText>
                     <div className="space-x-4">
-                        <Link to="/communities" className="btn btn-outline">
-                            Cari Komunitas
+                        <Link 
+                            to="/communities" 
+                            className="inline-flex items-center px-4 py-2 border border-blue-300 text-sm font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                        >
+                            <ReadableText tag="span" textToRead="Link untuk mencari komunitas">
+                                Cari Komunitas
+                            </ReadableText>
                         </Link>
-                         <Link to="/communities/create" className="btn btn-primary inline-flex items-center">
-                            <PlusCircle size={18} className="mr-2"/> Buat Komunitas Baru
+                         <Link 
+                            to="/communities/create" 
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                        >
+                            <PlusCircle size={18} className="mr-2"/>
+                            <ReadableText tag="span" textToRead="Link untuk membuat komunitas baru">
+                                Buat Komunitas Baru
+                            </ReadableText>
                         </Link>
                     </div>
                 </div>
@@ -60,9 +78,17 @@ export default function MyCommunities({ user }) {
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold text-gray-800">Komunitas yang Saya Ikuti</h2>
-                 <Link to="/communities/create" className="btn btn-primary btn-sm inline-flex items-center">
-                    <PlusCircle size={18} className="mr-2"/> Buat Komunitas
+                <ReadableText tag="h2" className="text-2xl font-semibold text-gray-800">
+                    Komunitas yang Saya Ikuti
+                </ReadableText>
+                 <Link 
+                    to="/communities/create" 
+                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                >
+                    <PlusCircle size={18} className="mr-2"/>
+                    <ReadableText tag="span" textToRead="Link untuk membuat komunitas baru">
+                        Buat Komunitas
+                    </ReadableText>
                 </Link>
             </div>
             {renderCommunityList(joinedCommunities, loadingJoined)}

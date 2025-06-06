@@ -2,20 +2,20 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Banner from "../../components/Banner/Banner";
-import CourseCard from "../../components/CourseCard/CourseCard"; // Pastikan CourseCard bisa menampilkan alasan jika ada
-import CommunityCard from "../../components/CommunityCard/CommunityCard"; // Pastikan CommunityCard bisa menampilkan alasan jika ada
+import CourseCard from "../../components/CourseCard/CourseCard";
+import CommunityCard from "../../components/CommunityCard/CommunityCard";
 import Loading from "../../components/Loading/Loading";
 import apiClient from "../../services/api";
 import LandingBannerImage from '../../assets/Login/login.png';
 import { ArrowRight, Zap, HelpCircle } from "react-feather";
 import ReadableText from "../../components/ReadableText/ReadableText";
-import { toast } from 'react-toastify'; // Untuk notifikasi jika ada error
+import { toast } from 'react-toastify';
 
 export default function HomePage() {
     const navigate = useNavigate();
     const [latestCourses, setLatestCourses] = useState([]);
     const [popularCommunities, setPopularCommunities] = useState([]);
-    const [loadingGeneral, setLoadingGeneral] = useState(true); // Ganti nama state loading
+    const [loadingGeneral, setLoadingGeneral] = useState(true);
 
     const [currentUser, setCurrentUser] = useState(null);
     const [recommendedCourses, setRecommendedCourses] = useState([]);
@@ -24,14 +24,13 @@ export default function HomePage() {
     const [showRecommendations, setShowRecommendations] = useState(false);
     const [recommendationError, setRecommendationError] = useState('');
 
-
     useEffect(() => {
         const userString = localStorage.getItem('user');
         if (userString) {
             setCurrentUser(JSON.parse(userString));
         }
 
-        const fetchGeneralData = async () => { // Ganti nama fungsi
+        const fetchGeneralData = async () => {
             setLoadingGeneral(true);
             try {
                 const coursesPromise = apiClient.get('/courses?limit=3&page=1');
@@ -41,7 +40,7 @@ export default function HomePage() {
                 setPopularCommunities(communitiesResponse.data.payload.data || []);
             } catch (error) {
                 console.error("Error fetching homepage general data:", error);
-                // toast.error("Gagal memuat beberapa data halaman utama.");
+                toast.error("Gagal memuat beberapa data halaman utama.");
             } finally {
                 setLoadingGeneral(false);
             }
@@ -54,9 +53,9 @@ export default function HomePage() {
             if (currentUser && (currentUser.bio || currentUser.disability_details)) {
                 setLoadingRecommendations(true);
                 setShowRecommendations(true);
-                setRecommendationError(''); // Reset error
+                setRecommendationError('');
                 try {
-                    const response = await apiClient.post('/recommendations', { // Endpoint dari backend
+                    const response = await apiClient.post('/recommendations', {
                         bio: currentUser.bio,
                         disabilityDetails: currentUser.disability_details
                     });
@@ -65,7 +64,6 @@ export default function HomePage() {
                         setRecommendedCourses(response.data.payload.recommendedCourses || []);
                         setRecommendedCommunities(response.data.payload.recommendedCommunities || []);
                         if ((response.data.payload.recommendedCourses || []).length === 0 && (response.data.payload.recommendedCommunities || []).length === 0) {
-                            // Jika AI tidak mengembalikan apa-apa, mungkin beri tahu pengguna
                             setRecommendationError("Kami belum menemukan rekomendasi yang sangat spesifik untuk Anda saat ini. Silakan jelajahi pilihan lainnya!");
                         }
                     } else {
@@ -80,7 +78,7 @@ export default function HomePage() {
                     setRecommendedCommunities([]);
                     const errMsg = error.response?.data?.message || "Terjadi kesalahan saat mengambil rekomendasi AI.";
                     setRecommendationError(errMsg);
-                    // toast.error(errMsg); // Tampilkan notifikasi error
+                    toast.error(errMsg);
                 } finally {
                     setLoadingRecommendations(false);
                 }
@@ -89,20 +87,19 @@ export default function HomePage() {
             }
         };
 
-        if (currentUser !== null) { // Pastikan currentUser sudah di-resolve (bisa jadi objek atau null)
+        if (currentUser !== null) {
             fetchRecommendations();
         }
     }, [currentUser]);
 
-    // Fungsi untuk render kartu dengan alasan
     const renderRecommendedItem = (item, type) => {
         const cardProps = type === 'course' ? { course: item } : { community: item };
         return (
             <div key={`${type}-${item.course_id || item.community_id}`} className="flex flex-col">
                 {type === 'course' ? <CourseCard {...cardProps} /> : <CommunityCard {...cardProps} />}
                 {item.recommendationReason && (
-                    <div className="mt-2 p-2.5 bg-yellow-50 border border-yellow-200 rounded-md text-xs text-yellow-700 flex items-start">
-                        <HelpCircle size={16} className="mr-2 flex-shrink-0 mt-0.5 text-yellow-600" />
+                    <div className="mt-2 p-2.5 bg-blue-50 border border-blue-200 rounded-md text-xs text-blue-700 flex items-start">
+                        <HelpCircle size={16} className="mr-2 flex-shrink-0 mt-0.5 text-blue-600" />
                         <ReadableText tag="p" textToRead={`Alasan direkomendasikan: ${item.recommendationReason}`}>
                             <strong>Mengapa ini direkomendasikan:</strong> {item.recommendationReason}
                         </ReadableText>
@@ -112,7 +109,6 @@ export default function HomePage() {
         );
     };
 
-
     return (
         <>
             {/* Hero Section */}
@@ -120,25 +116,25 @@ export default function HomePage() {
                 className="relative w-full h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)] bg-cover bg-center flex items-center justify-center"
                 style={{ backgroundImage: `url(${LandingBannerImage})` }}
             >
-                <div className="absolute inset-0 bg-black opacity-50"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-blue-600/70"></div>
                 <div className="relative z-10 text-center px-4">
                     <ReadableText
                         tag="h1"
                         className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight mb-6"
                     >
                         <span className="block">Ruang Inklusif,</span>
-                        <span className="block text-orange-400">Potensi Tanpa Batas.</span>
+                        <span className="block text-blue-300">Potensi Tanpa Batas.</span>
                     </ReadableText>
                     <ReadableText
                         tag="p"
-                        className="text-lg sm:text-xl md:text-2xl text-gray-200 max-w-2xl mx-auto mb-8"
+                        className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-2xl mx-auto mb-8"
                     >
                         Temukan pelatihan yang memberdayakan, bergabunglah dengan komunitas suportif, dan raih impianmu bersama RakitCita.
                     </ReadableText>
                     <ReadableText
                         tag="button"
-                        onClick={() => navigate(currentUser ? '/dashboard' : '/register')} // Arahkan ke dashboard jika sudah login
-                        className="btn btn-primary text-lg px-8 py-3 transform hover:scale-105 transition-transform duration-300"
+                        onClick={() => navigate(currentUser ? '/dashboard' : '/register')}
+                        className="btn btn-primary text-lg px-8 py-3 transform hover:scale-105 transition-transform duration-300 shadow-lg hover:shadow-xl"
                         textToRead={currentUser ? "Tombol Masuk ke Dashboard Anda" : "Tombol Mulai Sekarang, Gratis!"}
                     >
                         {currentUser ? "Dashboard Saya" : "Mulai Sekarang, Gratis!"}
@@ -149,11 +145,11 @@ export default function HomePage() {
 
             {/* AI Recommendations Section */}
             {showRecommendations && (
-                <section className="py-16 bg-orange-50">
+                <section className="py-16 bg-gradient-to-br from-blue-50 to-blue-100">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-12">
-                            <ReadableText tag="h2" className="text-3xl font-bold text-orange-700 flex items-center justify-center">
-                                <Zap size={30} className="mr-3" /> Rekomendasi Untuk Anda
+                            <ReadableText tag="h2" className="text-3xl font-bold text-blue-700 flex items-center justify-center">
+                                <Zap size={30} className="mr-3 text-blue-600" /> Rekomendasi Untuk Anda
                             </ReadableText>
                             <ReadableText tag="p" className="text-gray-600 mt-2">
                                 Berdasarkan profil Anda, berikut beberapa hal yang mungkin cocok.
@@ -162,7 +158,7 @@ export default function HomePage() {
                         {loadingRecommendations ? (
                             <Loading message="Menganalisis profil & mencari rekomendasi terbaik..." />
                         ) : recommendationError ? (
-                            <ReadableText tag="p" className="text-center text-orange-700 bg-orange-100 p-4 rounded-md">
+                            <ReadableText tag="p" className="text-center text-blue-700 bg-blue-100 p-4 rounded-md border border-blue-200">
                                 {recommendationError}
                             </ReadableText>
                         ) : (
@@ -187,7 +183,6 @@ export default function HomePage() {
                                         </div>
                                     </div>
                                 )}
-                                {/* Pesan ini sekarang dihandle oleh recommendationError state */}
                             </>
                         )}
                     </div>
@@ -195,7 +190,7 @@ export default function HomePage() {
             )}
 
             {/* Featured Courses Section */}
-            <section className="py-16 bg-gray-50">
+            <section className="py-16 bg-gradient-to-br from-gray-50 to-blue-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
                         <ReadableText tag="h2" className="text-3xl font-bold text-gray-800">
@@ -221,7 +216,7 @@ export default function HomePage() {
                         </ReadableText>
                     )}
                     <div className="text-center mt-10">
-                        <Link to="/courses" className="btn btn-outline inline-flex items-center">
+                        <Link to="/courses" className="btn btn-outline inline-flex items-center border-blue-300 text-blue-700 hover:bg-blue-50">
                             <ReadableText tag="span" textToRead="Lihat Semua Pelatihan">
                                 Lihat Semua Pelatihan
                             </ReadableText>
@@ -258,7 +253,7 @@ export default function HomePage() {
                         </ReadableText>
                     )}
                      <div className="text-center mt-10">
-                        <Link to="/communities" className="btn btn-outline inline-flex items-center">
+                        <Link to="/communities" className="btn btn-outline inline-flex items-center border-blue-300 text-blue-700 hover:bg-blue-50">
                             <ReadableText tag="span" textToRead="Lihat Semua Komunitas">
                                 Lihat Semua Komunitas
                             </ReadableText>

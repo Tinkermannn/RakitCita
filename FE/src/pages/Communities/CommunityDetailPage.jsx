@@ -3,8 +3,9 @@ import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../../services/api';
 import { toast } from 'react-toastify';
 import Loading from '../../components/Loading/Loading';
+import ReadableText from '../../components/ReadableText/ReadableText';
 import DefaultCommunityImage from '../../assets/todologo.png';
-import { Users, UserPlus, UserCheck, LogOut, Edit3, Trash2, ArrowLeft, Send, MessageSquare, Clock, Shield, UserX, UserMinus } from 'react-feather';
+import { Users, UserPlus, UserCheck, LogOut, Edit3, Trash2, ArrowLeft, Send, MessageSquare, Clock, Shield, UserX, User as UserIcon } from 'react-feather';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -19,7 +20,7 @@ export default function CommunityDetailPage() {
     const [currentUser, setCurrentUser] = useState(null);
     const [isMember, setIsMember] = useState(false);
     const [membershipDetails, setMembershipDetails] = useState(null);
-    const [isCreatorOrAdmin, setIsCreatorOrAdmin] = useState(false); // Platform admin or community admin/creator
+    const [isCreatorOrAdmin, setIsCreatorOrAdmin] = useState(false);
 
     // Dummy posts state for community feed
     const [posts, setPosts] = useState([]);
@@ -38,7 +39,6 @@ export default function CommunityDetailPage() {
             if (response.data.success) {
                 const fetchedCommunity = response.data.payload;
                 setCommunity(fetchedCommunity);
-                // The backend now includes `isCurrentUserMember` and `currentUserRoleInCommunity`
                 setIsMember(fetchedCommunity.isCurrentUserMember || false);
                 setMembershipDetails(fetchedCommunity.isCurrentUserMember ? { role_in_community: fetchedCommunity.currentUserRoleInCommunity } : null);
 
@@ -69,7 +69,7 @@ export default function CommunityDetailPage() {
         } finally {
             setLoading(false);
         }
-    }, [communityId, navigate, currentUser]); // Tambahkan currentUser
+    }, [communityId, navigate, currentUser]);
 
     const fetchMembers = useCallback(async (page = 1) => {
         setLoadingMembers(true);
@@ -88,22 +88,19 @@ export default function CommunityDetailPage() {
         }
     }, [communityId]);
 
-
     useEffect(() => {
         const userString = localStorage.getItem('user');
         if (userString) {
             setCurrentUser(JSON.parse(userString));
         }
-        // fetchCommunityDetails akan dipanggil setelah currentUser di-set dan jika communityId ada
     }, []);
 
     useEffect(() => {
-        if (communityId && currentUser !== undefined) { // Pastikan currentUser sudah diinisialisasi (bisa null)
+        if (communityId && currentUser !== undefined) {
             fetchCommunityDetails();
             fetchMembers();
         }
     }, [communityId, currentUser, fetchCommunityDetails, fetchMembers]);
-
 
     const handleJoinLeaveCommunity = async () => {
         if (!currentUser) {
@@ -111,7 +108,7 @@ export default function CommunityDetailPage() {
             navigate('/login', { state: { from: location.pathname } });
             return;
         }
-        setLoading(true); // Atau state loading spesifik
+        setLoading(true);
         const action = isMember ? 'leave' : 'join';
         const method = isMember ? 'delete' : 'post';
         try {
@@ -119,9 +116,9 @@ export default function CommunityDetailPage() {
             if (response.data.success) {
                 toast.success(`Berhasil ${action === 'join' ? 'bergabung dengan' : 'meninggalkan'} komunitas!`);
                 setIsMember(!isMember);
-                setMembershipDetails(action === 'join' ? response.data.payload : null); // Update membership
-                fetchCommunityDetails(); // Re-fetch untuk update member count, etc.
-                fetchMembers(); // Re-fetch member list
+                setMembershipDetails(action === 'join' ? response.data.payload : null);
+                fetchCommunityDetails();
+                fetchMembers();
             } else {
                 toast.error(response.data.message || `Gagal ${action} komunitas.`);
             }
@@ -158,7 +155,7 @@ export default function CommunityDetailPage() {
         e.preventDefault();
         if (!newPost.trim() || !currentUser) return;
         setLoadingPosts(true);
-        setTimeout(() => { // Simulasikan API call
+        setTimeout(() => {
             const postToAdd = {
                 id: posts.length + 1,
                 user: currentUser.name,
@@ -183,7 +180,7 @@ export default function CommunityDetailPage() {
                 const response = await apiClient.patch(`/communities/${communityId}/members/${memberId}/role`, { role_in_community: newRole });
                 if (response.data.success) {
                     toast.success("Peran anggota berhasil diubah.");
-                    fetchMembers(membersPage); // Refresh member list
+                    fetchMembers(membersPage);
                 } else {
                     toast.error(response.data.message || "Gagal mengubah peran anggota.");
                 }
@@ -207,8 +204,8 @@ export default function CommunityDetailPage() {
                 const response = await apiClient.delete(`/communities/${communityId}/members/${memberId}`);
                  if (response.data.success) {
                     toast.success("Anggota berhasil dikeluarkan.");
-                    fetchMembers(membersPage); // Refresh member list
-                    fetchCommunityDetails(); // Refresh community details (member count)
+                    fetchMembers(membersPage);
+                    fetchCommunityDetails();
                 } else {
                     toast.error(response.data.message || "Gagal mengeluarkan anggota.");
                 }
@@ -219,7 +216,7 @@ export default function CommunityDetailPage() {
     };
 
     if (loading && !community) return <div className="container mx-auto p-4"><Loading message="Memuat detail komunitas..." /></div>;
-    if (error) return <div className="container mx-auto p-4 text-center text-red-500 bg-red-100 p-4 rounded-md">{error}</div>;
+    if (error) return <div className="container mx-auto text-center text-red-500 bg-red-100 p-4 rounded-md">{error}</div>;
     if (!community) return <div className="container mx-auto p-4 text-center">Detail komunitas tidak ditemukan.</div>;
 
     const imageUrl = community.banner_url || DefaultCommunityImage;
@@ -227,37 +224,49 @@ export default function CommunityDetailPage() {
 
 
     return (
-        <div className="bg-gray-50 min-h-screen">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
             <div className="container mx-auto px-4 py-8">
-                <button onClick={() => navigate(-1)} className="mb-6 inline-flex items-center text-orange-600 hover:text-orange-800">
+                <ReadableText
+                    tag="button"
+                    onClick={() => navigate(-1)}
+                    className="mb-6 inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                    textToRead="Tombol Kembali ke Halaman Sebelumnya"
+                >
                     <ArrowLeft size={20} className="mr-2" /> Kembali
-                </button>
+                </ReadableText>
 
-                <div className="bg-white shadow-xl rounded-lg overflow-hidden">
+                <div className="bg-white shadow-xl rounded-lg overflow-hidden border border-blue-100">
                     {/* Header Komunitas */}
                     <div className="relative">
                         <img src={imageUrl} alt={community.name} className="w-full h-56 md:h-80 object-cover" 
                              onError={(e) => { e.target.onerror = null; e.target.src = DefaultCommunityImage; }}/>
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
                         <div className="absolute bottom-0 left-0 p-6 md:p-8">
-                            <h1 className="text-3xl md:text-4xl font-bold text-white mb-1">{community.name}</h1>
-                            <p className="text-orange-300 text-sm flex items-center">
+                            <ReadableText tag="h1" className="text-3xl md:text-4xl font-bold text-white mb-1">
+                                {community.name}
+                            </ReadableText>
+                            <ReadableText tag="p" className="text-blue-300 text-sm flex items-center">
                                 <Users size={16} className="mr-1.5"/> {community.member_count || 0} Anggota
                                 {community.creator_name && (
                                     <span className="ml-3">Dibuat oleh: 
-                                        <Link to={`/profile/${community.creator_id}`} className="hover:text-orange-100"> {community.creator_name}</Link>
+                                        <Link to={`/profile/${community.creator_id}`} className="hover:text-blue-100"> {community.creator_name}</Link>
                                     </span>
                                 )}
-                            </p>
+                            </ReadableText>
                         </div>
                         {isCreatorOrAdmin && (
                             <div className="absolute top-4 right-4 space-x-2">
-                                <Link to={`/communities/edit/${communityId}`} className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 shadow-md">
+                                <Link to={`/communities/edit/${communityId}`} className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 shadow-md transition-colors duration-200">
                                     <Edit3 size={18} />
                                 </Link>
-                                <button onClick={handleDeleteCommunity} className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-md">
+                                <ReadableText
+                                    tag="button"
+                                    onClick={handleDeleteCommunity}
+                                    className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-md transition-colors duration-200"
+                                    textToRead="Tombol Hapus Komunitas"
+                                >
                                     <Trash2 size={18} />
-                                </button>
+                                </ReadableText>
                             </div>
                         )}
                     </div>
@@ -266,82 +275,102 @@ export default function CommunityDetailPage() {
                     <div className="p-6 md:p-8">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                             <div className="mb-4 md:mb-0">
-                                <h2 className="text-2xl font-semibold text-gray-800 mb-1">Tentang Komunitas</h2>
-                                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                                <ReadableText tag="h2" className="text-2xl font-semibold text-gray-800 mb-1">
+                                    Tentang Komunitas
+                                </ReadableText>
+                                <ReadableText tag="p" className="text-gray-700 leading-relaxed whitespace-pre-line">
                                     {community.description || "Komunitas ini belum memiliki deskripsi."}
-                                </p>
+                                </ReadableText>
                             </div>
                             {currentUser && (
-                                <button
+                                <ReadableText
+                                    tag="button"
                                     onClick={handleJoinLeaveCommunity}
                                     disabled={loading}
-                                    className={`btn ${isMember ? 'btn-secondary' : 'btn-primary'} py-2.5 px-5 text-sm md:text-base inline-flex items-center w-full md:w-auto justify-center`}
+                                    className={`inline-flex items-center py-2.5 px-5 text-sm md:text-base border border-transparent font-medium rounded-lg w-full md:w-auto justify-center transition-colors duration-200 ${
+                                        isMember 
+                                            ? 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50 focus:ring-gray-500' 
+                                            : 'text-white bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+                                    } focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50`}
+                                    textToRead={isMember ? "Tombol Tinggalkan Komunitas" : "Tombol Bergabung Komunitas"}
                                 >
                                     {isMember ? <LogOut size={18} className="mr-2"/> : <UserPlus size={18} className="mr-2"/>}
                                     {loading ? "Memproses..." : (isMember ? "Tinggalkan Komunitas" : "Bergabung Komunitas")}
-                                </button>
+                                </ReadableText>
                             )}
                              {!currentUser && (
-                                 <button
+                                 <ReadableText
+                                    tag="button"
                                     onClick={() => {navigate('/login', { state: { from: location.pathname } })}}
-                                    className="btn btn-primary py-2.5 px-5 text-sm md:text-base w-full md:w-auto justify-center"
+                                    className="inline-flex items-center py-2.5 px-5 text-sm md:text-base border border-transparent font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 w-full md:w-auto justify-center transition-colors duration-200"
+                                    textToRead="Tombol Login untuk Bergabung"
                                 >
                                     Login untuk Bergabung
-                                </button>
+                                </ReadableText>
                             )}
                         </div>
 
-                        {/* Tabs: Posts, Members, (Maybe Events later) */}
-                        {/* For MVP, let's keep it simple. Show members directly. Feed can be a next feature. */}
-
                         {/* Community Feed (Dummy) */}
                         {isMember && (
-                            <div className="mb-10 pt-6 border-t">
-                                <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                                    <MessageSquare size={24} className="mr-2 text-orange-500"/> Diskusi Komunitas
-                                </h3>
+                            <div className="mb-10 pt-6 border-t border-blue-100">
+                                <ReadableText tag="h3" className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                                    <MessageSquare size={24} className="mr-2 text-blue-500"/> Diskusi Komunitas
+                                </ReadableText>
                                 <form onSubmit={handleAddPost} className="mb-6">
                                     <textarea
                                         value={newPost}
                                         onChange={(e) => setNewPost(e.target.value)}
                                         placeholder="Mulai diskusi atau bagikan sesuatu..."
                                         rows="3"
-                                        className="input-field w-full mb-2"
+                                        className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-2 transition-colors duration-200"
                                         required
                                     ></textarea>
-                                    <button type="submit" className="btn btn-primary btn-sm inline-flex items-center" disabled={loadingPosts}>
+                                    <ReadableText
+                                        tag="button"
+                                        type="submit"
+                                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 disabled:opacity-50"
+                                        disabled={loadingPosts}
+                                        textToRead="Tombol Kirim Postingan"
+                                    >
                                         <Send size={16} className="mr-2"/> {loadingPosts ? 'Mengirim...' : 'Kirim Postingan'}
-                                    </button>
+                                    </ReadableText>
                                 </form>
                                 <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
                                     {posts.length > 0 ? posts.map(post => (
-                                        <div key={post.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-md shadow-sm">
+                                        <div key={post.id} className="flex items-start space-x-3 p-3 bg-blue-50 rounded-md shadow-sm border border-blue-100">
                                             <img src={post.avatar} alt={post.user} className="w-10 h-10 rounded-full object-cover"/>
                                             <div>
-                                                <p className="font-semibold text-sm text-gray-800">{post.user}</p>
-                                                <p className="text-sm text-gray-600">{post.text}</p>
-                                                <p className="text-xs text-gray-400 mt-1 flex items-center">
+                                                <ReadableText tag="p" className="font-semibold text-sm text-gray-800">
+                                                    {post.user}
+                                                </ReadableText>
+                                                <ReadableText tag="p" className="text-sm text-gray-600">
+                                                    {post.text}
+                                                </ReadableText>
+                                                <ReadableText tag="p" className="text-xs text-gray-400 mt-1 flex items-center">
                                                     <Clock size={12} className="mr-1"/> {formatDistanceToNow(parseISO(post.timestamp), { addSuffix: true, locale: id })}
-                                                </p>
+                                                </ReadableText>
                                             </div>
                                         </div>
-                                    )) : <p className="text-sm text-gray-500 text-center">Belum ada postingan.</p>}
+                                    )) : (
+                                        <ReadableText tag="p" className="text-sm text-gray-500 text-center">
+                                            Belum ada postingan.
+                                        </ReadableText>
+                                    )}
                                 </div>
                             </div>
                         )}
 
-
                         {/* Daftar Anggota */}
-                        <div className="pt-6 border-t">
-                             <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                                <Users size={24} className="mr-2 text-orange-500"/> Anggota Komunitas ({community.member_count || 0})
-                            </h3>
+                        <div className="pt-6 border-t border-blue-100">
+                             <ReadableText tag="h3" className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                                <Users size={24} className="mr-2 text-blue-500"/> Anggota Komunitas ({community.member_count || 0})
+                            </ReadableText>
                             {loadingMembers ? (
                                 <Loading message="Memuat anggota..." />
                             ) : members.length > 0 ? (
                                 <div className="space-y-3">
                                     {members.map(member => (
-                                        <div key={member.user_id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md shadow-sm">
+                                        <div key={member.user_id} className="flex items-center justify-between p-3 bg-blue-50 rounded-md shadow-sm border border-blue-100">
                                             <div className="flex items-center space-x-3">
                                                 <img 
                                                     src={member.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=random`} 
@@ -349,66 +378,98 @@ export default function CommunityDetailPage() {
                                                     className="w-10 h-10 rounded-full object-cover"
                                                 />
                                                 <div>
-                                                    <Link to={`/profile/${member.user_id}`} className="font-medium text-gray-800 hover:text-orange-600">{member.name}</Link>
-                                                    <p className="text-xs text-gray-500 capitalize flex items-center">
+                                                    <Link to={`/profile/${member.user_id}`} className="font-medium text-gray-800 hover:text-blue-600">
+                                                        <ReadableText tag="span" textToRead={`Profil ${member.name}`}>
+                                                            {member.name}
+                                                        </ReadableText>
+                                                    </Link>
+                                                    <ReadableText tag="p" className="text-xs text-gray-500 capitalize flex items-center">
                                                         {member.role_in_community === 'admin' && <Shield size={12} className="mr-1 text-red-500"/>}
                                                         {member.role_in_community === 'moderator' && <UserCheck size={12} className="mr-1 text-blue-500"/>}
                                                         {member.role_in_community}
-                                                    </p>
+                                                    </ReadableText>
                                                 </div>
                                             </div>
                                             {/* Admin actions for members */}
                                             {canManageMembers && member.user_id !== currentUser.user_id && (
                                                 <div className="flex space-x-2">
                                                     {member.role_in_community !== 'admin' && (
-                                                        <button 
+                                                        <ReadableText
+                                                            tag="button"
                                                             onClick={() => handleChangeMemberRole(member.user_id, 'admin')}
                                                             title="Jadikan Admin"
-                                                            className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full"
+                                                            className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full transition-colors duration-200"
+                                                            textToRead="Tombol Jadikan Admin"
                                                         >
                                                             <Shield size={16} />
-                                                        </button>
+                                                        </ReadableText>
                                                     )}
                                                      {member.role_in_community !== 'moderator' && member.role_in_community !== 'admin' && (
-                                                        <button 
+                                                        <ReadableText
+                                                            tag="button"
                                                             onClick={() => handleChangeMemberRole(member.user_id, 'moderator')}
                                                             title="Jadikan Moderator"
-                                                            className="p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-100 rounded-full"
+                                                            className="p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-100 rounded-full transition-colors duration-200"
+                                                            textToRead="Tombol Jadikan Moderator"
                                                         >
                                                             <UserCheck size={16} />
-                                                        </button>
+                                                        </ReadableText>
                                                     )}
                                                      {(member.role_in_community === 'admin' || member.role_in_community === 'moderator') && member.role_in_community !== 'member' && (
-                                                        <button 
+                                                        <ReadableText
+                                                            tag="button"
                                                             onClick={() => handleChangeMemberRole(member.user_id, 'member')}
                                                             title="Jadikan Member Biasa"
-                                                            className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-full"
+                                                            className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-full transition-colors duration-200"
+                                                            textToRead="Tombol Jadikan Member Biasa"
                                                         >
-                                                            <UserIconFeather size={16} /> {/* Menggunakan UserIconFeather dari react-feather */}
-                                                        </button>
+                                                            <UserIcon size={16} />
+                                                        </ReadableText>
                                                     )}
-                                                    <button 
+                                                    <ReadableText
+                                                        tag="button"
                                                         onClick={() => handleRemoveMember(member.user_id)}
                                                         title="Keluarkan dari Komunitas"
-                                                        className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-100 rounded-full"
+                                                        className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-100 rounded-full transition-colors duration-200"
+                                                        textToRead="Tombol Keluarkan dari Komunitas"
                                                     >
                                                         <UserX size={16} />
-                                                    </button>
+                                                    </ReadableText>
                                                 </div>
                                             )}
                                         </div>
                                     ))}
                                      {/* Pagination untuk Anggota */}
                                     {membersTotalPages > 1 && (
-                                        <div className="mt-6 flex justify-center items-center space-x-1">
-                                            <button onClick={() => fetchMembers(membersPage - 1)} disabled={membersPage === 1} className="btn btn-secondary btn-sm px-2 py-1 disabled:opacity-50">Sebelumnya</button>
-                                            <span className="text-sm text-gray-600">Hal {membersPage} dari {membersTotalPages}</span>
-                                            <button onClick={() => fetchMembers(membersPage + 1)} disabled={membersPage === membersTotalPages} className="btn btn-secondary btn-sm px-2 py-1 disabled:opacity-50">Berikutnya</button>
+                                        <div className="mt-6 flex justify-center items-center space-x-2">
+                                            <ReadableText
+                                                tag="button"
+                                                onClick={() => fetchMembers(membersPage - 1)}
+                                                disabled={membersPage === 1}
+                                                className="py-2 px-4 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                                textToRead="Tombol Halaman Sebelumnya"
+                                            >
+                                                Sebelumnya
+                                            </ReadableText>
+                                            <ReadableText tag="span" className="text-sm text-gray-600">
+                                                Hal {membersPage} dari {membersTotalPages}
+                                            </ReadableText>
+                                            <ReadableText
+                                                tag="button"
+                                                onClick={() => fetchMembers(membersPage + 1)}
+                                                disabled={membersPage === membersTotalPages}
+                                                className="py-2 px-4 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                                textToRead="Tombol Halaman Berikutnya"
+                                            >
+                                                Berikutnya
+                                            </ReadableText>
                                         </div>
                                     )}
                                 </div>
                             ) : (
-                                <p className="text-sm text-gray-500 text-center">Belum ada anggota selain Anda (jika Anda baru saja bergabung).</p>
+                                <ReadableText tag="p" className="text-sm text-gray-500 text-center">
+                                    Belum ada anggota selain Anda (jika Anda baru saja bergabung).
+                                </ReadableText>
                             )}
                         </div>
                     </div>
