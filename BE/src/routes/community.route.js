@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const communityController = require('../controllers/community.controller');
-const authenticateJWT = require('../Middleware/Auth');
+const authenticateJWT = require('../Middleware/auth');
 const authorize = require('../Middleware/authorize');
 const { upload, handleUploadError } = require('../Middleware/upload');
 
