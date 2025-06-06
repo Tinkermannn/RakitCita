@@ -24,7 +24,7 @@ app.use(rateLimit({
 }));
 
 app.use(cors({
-    origin: ['https://rakit-cita-be.vercel.app/api/v1', 'http://localhost:5173', 'https://tutam-9-sbd-fe.vercel.app', 'http://192.168.1.73:5173', 'http://localhost:3000', 'http://localhost:5173'],
+    origin: ['https://rakit-cita.vercel.app/', 'http://localhost:5173', 'https://tutam-9-sbd-fe.vercel.app', 'http://192.168.1.73:5173', 'http://localhost:3000', 'http://localhost:5173'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
