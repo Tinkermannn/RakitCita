@@ -8,6 +8,8 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const xss = require('xss-clean');
 
+app.set('trust proxy', true);
+
 // General rate limiter
 app.use(rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -22,7 +24,7 @@ app.use(rateLimit({
 }));
 
 app.use(cors({
-    origin: ['https://os.netlabdte.com', 'http://localhost:5173', 'https://tutam-9-sbd-fe.vercel.app', 'http://192.168.1.73:5173', 'http://localhost:3000'], // Sesuaikan dengan origin frontend Anda
+    origin: ['https://rakit-cita-be.vercel.app', 'http://localhost:5173', 'https://tutam-9-sbd-fe.vercel.app', 'http://192.168.1.73:5173', 'http://localhost:3000'], // Sesuaikan dengan origin frontend Anda
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
