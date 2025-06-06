@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import apiClient from '../../services/api';
 import { toast } from 'react-toastify';
 import Loading from '../../components/Loading/Loading';
 import ReadableText from '../../components/ReadableText/ReadableText';
 import DefaultAvatar from '../../assets/todologo.png';
-import { User, Mail, Briefcase, Info, Edit3, Camera } from 'react-feather';
+import { User, Mail, Info, Edit3, Camera } from 'react-feather';
 import EditProfileModal from './EditProfileModal';
 
 export default function ProfilePage() {
@@ -17,7 +17,6 @@ export default function ProfilePage() {
     const [isOwnProfile, setIsOwnProfile] = useState(false);
     const [loggedInUser, setLoggedInUser] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
-    const [profilePictureFile, setProfilePictureFile] = useState(null);
     const [uploadingPicture, setUploadingPicture] = useState(false);
 
     useEffect(() => {
@@ -31,7 +30,7 @@ export default function ProfilePage() {
         }
     }, [userId]);
     
-    const fetchProfile = async () => {
+    const fetchProfile = useCallback(async () => {
         setLoading(true);
         setError('');
         try {
@@ -55,13 +54,13 @@ export default function ProfilePage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [isOwnProfile, loggedInUser, userId, navigate]);
 
     useEffect(() => {
         if (userId && (loggedInUser || !isOwnProfile)) {
             fetchProfile();
         }
-    }, [userId, loggedInUser, isOwnProfile]);
+    }, [userId, loggedInUser, isOwnProfile, fetchProfile]);
 
     const handleProfileUpdate = (updatedProfileData) => {
         setProfile(prev => ({ ...prev, ...updatedProfileData }));
@@ -75,7 +74,6 @@ export default function ProfilePage() {
 
     const handleFileChange = (e) => {
         if (e.target.files[0]) {
-            setProfilePictureFile(e.target.files[0]);
             handlePictureUpload(e.target.files[0]);
         }
     };
@@ -100,7 +98,6 @@ export default function ProfilePage() {
                     setLoggedInUser(updatedLoggedInUser);
                 }
                 toast.success('Foto profil berhasil diperbarui!');
-                setProfilePictureFile(null);
             } else {
                 toast.error(response.data.message || 'Gagal mengunggah foto profil.');
             }

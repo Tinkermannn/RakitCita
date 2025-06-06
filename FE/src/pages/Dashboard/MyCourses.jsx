@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import apiClient from '../../services/api';
 import CourseCard from '../../components/CourseCard/CourseCard';
 import Loading from '../../components/Loading/Loading';
@@ -12,9 +12,9 @@ export default function MyCourses({ user }) {
     const [createdCourses, setCreatedCourses] = useState([]);
     const [loadingEnrolled, setLoadingEnrolled] = useState(true);
     const [loadingCreated, setLoadingCreated] = useState(true);
-    const [activeSubTab, setActiveSubTab] = useState('enrolled'); // 'enrolled' or 'created'
+    const [activeSubTab, setActiveSubTab] = useState('enrolled');
 
-    const fetchEnrolledCourses = async () => {
+    const fetchEnrolledCourses = useCallback(async () => {
         setLoadingEnrolled(true);
         try {
             const response = await apiClient.get('/courses/enrolled/me');
@@ -29,9 +29,9 @@ export default function MyCourses({ user }) {
         } finally {
             setLoadingEnrolled(false);
         }
-    };
+    }, []);
 
-    const fetchCreatedCourses = async () => {
+    const fetchCreatedCourses = useCallback(async () => {
         if (user.role !== 'mentor' && user.role !== 'admin') {
             setLoadingCreated(false);
             return;
@@ -50,14 +50,14 @@ export default function MyCourses({ user }) {
         } finally {
             setLoadingCreated(false);
         }
-    };
+    }, [user.role]);
 
     useEffect(() => {
         fetchEnrolledCourses();
         if (user.role === 'mentor' || user.role === 'admin') {
             fetchCreatedCourses();
         }
-    }, [user.role]);
+    }, [user.role, fetchEnrolledCourses, fetchCreatedCourses]);
 
     const renderCourseList = (courses, isLoading, type) => {
         if (isLoading) return <Loading message={`Memuat pelatihan ${type === 'enrolled' ? 'yang diikuti' : 'yang dibuat'}...`} />;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../services/api';
+import ReadableText from '../../components/ReadableText/ReadableText';
 import { toast } from 'react-toastify';
 import { ArrowLeft, PlusCircle, UploadCloud } from 'react-feather';
 
@@ -10,7 +11,7 @@ export default function CreateCoursePage() {
         title: '',
         description: '',
         category: '',
-        level: 'beginner', // Default level
+        level: 'beginner',
         thumbnail: null,
     });
     const [loading, setLoading] = useState(false);
@@ -33,11 +34,11 @@ export default function CreateCoursePage() {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            if (file.size > 5 * 1024 * 1024) {
                 toast.error("Ukuran file thumbnail maksimal 5MB.");
                 setFormData(prev => ({ ...prev, thumbnail: null }));
                 setPreviewThumbnail(null);
-                e.target.value = null; // Reset input file
+                e.target.value = null;
                 return;
             }
             if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
@@ -55,7 +56,6 @@ export default function CreateCoursePage() {
         }
     };
     
-    // Cleanup URL Object
     useEffect(() => {
         return () => {
             if (previewThumbnail) {
@@ -94,7 +94,7 @@ export default function CreateCoursePage() {
 
             if (response.data.success) {
                 toast.success('Pelatihan berhasil dibuat!');
-                navigate(`/courses/${response.data.payload.course_id}`); // Arahkan ke detail pelatihan baru
+                navigate(`/courses/${response.data.payload.course_id}`);
             } else {
                 setError(response.data.message || 'Gagal membuat pelatihan.');
                 toast.error(response.data.message || 'Gagal membuat pelatihan.');
@@ -104,7 +104,7 @@ export default function CreateCoursePage() {
             const errorMessage = err.response?.data?.message || 'Terjadi kesalahan server.';
             setError(errorMessage);
             toast.error(errorMessage);
-             if (err.response?.data?.payload?.errors) { // Jika ada validasi error dari backend
+             if (err.response?.data?.payload?.errors) {
                 const validationErrors = err.response.data.payload.errors.map(e => e.msg).join('\n');
                 setError(prev => prev + '\n' + validationErrors);
             }
@@ -115,77 +115,186 @@ export default function CreateCoursePage() {
 
     return (
         <div className="container mx-auto p-4 md:p-8 max-w-2xl">
-            <button onClick={() => navigate(-1)} className="mb-6 inline-flex items-center text-orange-600 hover:text-orange-800">
+            <ReadableText
+                tag="button"
+                onClick={() => navigate(-1)}
+                className="mb-6 inline-flex items-center text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md transition-colors duration-200"
+                textToRead="Tombol untuk kembali ke halaman sebelumnya"
+            >
                 <ArrowLeft size={20} className="mr-2" /> Kembali
-            </button>
-            <div className="bg-white p-8 rounded-lg shadow-xl">
-                <h1 className="text-3xl font-bold text-gray-800 mb-2 flex items-center">
-                    <PlusCircle size={30} className="mr-3 text-orange-500" /> Buat Pelatihan Baru
-                </h1>
-                <p className="text-gray-600 mb-8">Bagikan pengetahuan dan keahlian Anda kepada komunitas.</p>
+            </ReadableText>
+            
+            <div className="bg-white p-8 rounded-lg shadow-xl border border-blue-100">
+                <ReadableText tag="h1" className="text-3xl font-bold text-gray-800 mb-2 flex items-center">
+                    <PlusCircle size={30} className="mr-3 text-blue-500" /> Buat Pelatihan Baru
+                </ReadableText>
+                <ReadableText tag="p" className="text-gray-600 mb-8">
+                    Bagikan pengetahuan dan keahlian Anda kepada komunitas.
+                </ReadableText>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {error && <div className="text-sm text-red-600 bg-red-100 p-3 rounded-md whitespace-pre-line">{error}</div>}
+                    {error && (
+                        <ReadableText 
+                            tag="div" 
+                            className="text-sm text-red-600 bg-red-100 p-3 rounded-md whitespace-pre-line border border-red-200"
+                            textToRead={`Error: ${error}`}
+                        >
+                            {error}
+                        </ReadableText>
+                    )}
                     
                     <div>
-                        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Judul Pelatihan <span className="text-red-500">*</span></label>
-                        <input type="text" name="title" id="title" value={formData.title} onChange={handleChange} className="input-field" required placeholder="Contoh: Dasar Pemrograman Python untuk Pemula"/>
+                        <ReadableText 
+                            tag="label" 
+                            htmlFor="title" 
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                            textToRead="Label untuk input judul pelatihan, field wajib"
+                        >
+                            Judul Pelatihan <span className="text-red-500">*</span>
+                        </ReadableText>
+                        <input 
+                            type="text" 
+                            name="title" 
+                            id="title" 
+                            value={formData.title} 
+                            onChange={handleChange} 
+                            className="w-full px-3 py-2 border border-blue-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200" 
+                            required 
+                            placeholder="Contoh: Dasar Pemrograman Python untuk Pemula"
+                        />
                     </div>
 
                     <div>
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Deskripsi <span className="text-red-500">*</span></label>
-                        <textarea name="description" id="description" rows="5" value={formData.description} onChange={handleChange} className="input-field" required placeholder="Jelaskan secara detail tentang pelatihan ini, apa yang akan dipelajari, dan untuk siapa."></textarea>
+                        <ReadableText 
+                            tag="label" 
+                            htmlFor="description" 
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                            textToRead="Label untuk input deskripsi pelatihan, field wajib"
+                        >
+                            Deskripsi <span className="text-red-500">*</span>
+                        </ReadableText>
+                        <textarea 
+                            name="description" 
+                            id="description" 
+                            rows="5" 
+                            value={formData.description} 
+                            onChange={handleChange} 
+                            className="w-full px-3 py-2 border border-blue-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200" 
+                            required 
+                            placeholder="Jelaskan secara detail tentang pelatihan ini, apa yang akan dipelajari, dan untuk siapa."
+                        ></textarea>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">Kategori <span className="text-red-500">*</span></label>
-                            <select name="category" id="category" value={formData.category} onChange={handleChange} className="input-field" required>
+                            <ReadableText 
+                                tag="label" 
+                                htmlFor="category" 
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                                textToRead="Label untuk pilihan kategori pelatihan, field wajib"
+                            >
+                                Kategori <span className="text-red-500">*</span>
+                            </ReadableText>
+                            <select 
+                                name="category" 
+                                id="category" 
+                                value={formData.category} 
+                                onChange={handleChange} 
+                                className="w-full px-3 py-2 border border-blue-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200" 
+                                required
+                            >
                                 <option value="" disabled>Pilih Kategori</option>
                                 {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="level" className="block text-sm font-medium text-gray-700 mb-1">Level Kesulitan <span className="text-red-500">*</span></label>
-                            <select name="level" id="level" value={formData.level} onChange={handleChange} className="input-field" required>
+                            <ReadableText 
+                                tag="label" 
+                                htmlFor="level" 
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                                textToRead="Label untuk pilihan level kesulitan pelatihan, field wajib"
+                            >
+                                Level Kesulitan <span className="text-red-500">*</span>
+                            </ReadableText>
+                            <select 
+                                name="level" 
+                                id="level" 
+                                value={formData.level} 
+                                onChange={handleChange} 
+                                className="w-full px-3 py-2 border border-blue-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200" 
+                                required
+                            >
                                 {levels.map(lvl => <option key={lvl.value} value={lvl.value}>{lvl.label}</option>)}
                             </select>
                         </div>
                     </div>
                     
                     <div>
-                        <label htmlFor="thumbnail" className="block text-sm font-medium text-gray-700 mb-1">Thumbnail Pelatihan (Opsional)</label>
-                        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                        <ReadableText 
+                            tag="label" 
+                            htmlFor="thumbnail" 
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                            textToRead="Label untuk upload thumbnail pelatihan, field opsional"
+                        >
+                            Thumbnail Pelatihan (Opsional)
+                        </ReadableText>
+                        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-blue-300 border-dashed rounded-md hover:border-blue-400 transition-colors duration-200">
                             <div className="space-y-1 text-center">
                                 {previewThumbnail ? (
                                     <img src={previewThumbnail} alt="Preview thumbnail" className="mx-auto h-32 w-auto object-contain mb-2 rounded"/>
                                 ) : (
-                                    <UploadCloud size={48} className="mx-auto text-gray-400" />
+                                    <UploadCloud size={48} className="mx-auto text-blue-400" />
                                 )}
                                 <div className="flex text-sm text-gray-600">
-                                    <label htmlFor="thumbnail" className="relative cursor-pointer bg-white rounded-md font-medium text-orange-600 hover:text-orange-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-orange-500">
+                                    <ReadableText
+                                        tag="label"
+                                        htmlFor="thumbnail"
+                                        className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 transition-colors duration-200"
+                                        textToRead="Tombol untuk mengunggah file thumbnail"
+                                    >
                                         <span>Unggah file</span>
-                                        <input id="thumbnail" name="thumbnail" type="file" className="sr-only" onChange={handleFileChange} accept="image/jpeg, image/png, image/gif, image/webp" />
-                                    </label>
-                                    <p className="pl-1">atau seret dan lepas</p>
+                                        <input 
+                                            id="thumbnail" 
+                                            name="thumbnail" 
+                                            type="file" 
+                                            className="sr-only" 
+                                            onChange={handleFileChange} 
+                                            accept="image/jpeg, image/png, image/gif, image/webp" 
+                                        />
+                                    </ReadableText>
+                                    <ReadableText tag="p" className="pl-1" textToRead="atau seret dan lepas file">
+                                        atau seret dan lepas
+                                    </ReadableText>
                                 </div>
-                                <p className="text-xs text-gray-500">PNG, JPG, GIF, WEBP hingga 5MB</p>
-                                {formData.thumbnail && <p className="text-xs text-green-600 mt-1">{formData.thumbnail.name}</p>}
+                                <ReadableText tag="p" className="text-xs text-gray-500" textToRead="Format file yang didukung PNG, JPG, GIF, WEBP hingga 5MB">
+                                    PNG, JPG, GIF, WEBP hingga 5MB
+                                </ReadableText>
+                                {formData.thumbnail && (
+                                    <ReadableText 
+                                        tag="p" 
+                                        className="text-xs text-green-600 mt-1"
+                                        textToRead={`File terpilih: ${formData.thumbnail.name}`}
+                                    >
+                                        {formData.thumbnail.name}
+                                    </ReadableText>
+                                )}
                             </div>
                         </div>
                     </div>
 
                     <div className="pt-4 flex justify-end">
-                        <button
+                        <ReadableText
+                            tag="button"
                             type="submit"
                             disabled={loading}
-                            className="btn btn-primary px-6 py-2.5 text-base disabled:opacity-50"
+                            className="inline-flex items-center px-6 py-2.5 text-base border border-transparent font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                            textToRead={loading ? "Sedang menyimpan pelatihan" : "Tombol untuk membuat pelatihan baru"}
                         >
                             {loading ? (
                                 <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white inline-block mr-2"></div>
                             ) : null}
                             {loading ? "Menyimpan..." : "Buat Pelatihan"}
-                        </button>
+                        </ReadableText>
                     </div>
                 </form>
             </div>

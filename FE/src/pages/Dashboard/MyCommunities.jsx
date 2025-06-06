@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import { PlusCircle } from 'react-feather';
 
-export default function MyCommunities({ user }) {
+export default function MyCommunities() {
     const [joinedCommunities, setJoinedCommunities] = useState([]);
     const [loadingJoined, setLoadingJoined] = useState(true);
 

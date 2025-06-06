@@ -121,6 +121,7 @@ export default function HomePage() {
                     <ReadableText
                         tag="h1"
                         className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight mb-6"
+                        textToRead="Ruang Inklusif, Potensi Tanpa Batas - slogan utama RakitCita"
                     >
                         <span className="block">Ruang Inklusif,</span>
                         <span className="block text-blue-300">Potensi Tanpa Batas.</span>
@@ -128,13 +129,14 @@ export default function HomePage() {
                     <ReadableText
                         tag="p"
                         className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-2xl mx-auto mb-8"
+                        textToRead="Deskripsi platform: Temukan pelatihan yang memberdayakan, bergabunglah dengan komunitas suportif, dan raih impianmu bersama RakitCita"
                     >
                         Temukan pelatihan yang memberdayakan, bergabunglah dengan komunitas suportif, dan raih impianmu bersama RakitCita.
                     </ReadableText>
                     <ReadableText
                         tag="button"
                         onClick={() => navigate(currentUser ? '/dashboard' : '/register')}
-                        className="btn btn-primary text-lg px-8 py-3 transform hover:scale-105 transition-transform duration-300 shadow-lg hover:shadow-xl"
+                        className="inline-flex items-center px-8 py-3 text-lg font-medium border border-transparent rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
                         textToRead={currentUser ? "Tombol Masuk ke Dashboard Anda" : "Tombol Mulai Sekarang, Gratis!"}
                     >
                         {currentUser ? "Dashboard Saya" : "Mulai Sekarang, Gratis!"}
@@ -148,24 +150,40 @@ export default function HomePage() {
                 <section className="py-16 bg-gradient-to-br from-blue-50 to-blue-100">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-12">
-                            <ReadableText tag="h2" className="text-3xl font-bold text-blue-700 flex items-center justify-center">
+                            <ReadableText 
+                                tag="h2" 
+                                className="text-3xl font-bold text-blue-800 flex items-center justify-center"
+                                textToRead="Bagian rekomendasi khusus untuk Anda"
+                            >
                                 <Zap size={30} className="mr-3 text-blue-600" /> Rekomendasi Untuk Anda
                             </ReadableText>
-                            <ReadableText tag="p" className="text-gray-600 mt-2">
+                            <ReadableText 
+                                tag="p" 
+                                className="text-blue-700 mt-2"
+                                textToRead="Berdasarkan profil Anda, berikut beberapa hal yang mungkin cocok"
+                            >
                                 Berdasarkan profil Anda, berikut beberapa hal yang mungkin cocok.
                             </ReadableText>
                         </div>
                         {loadingRecommendations ? (
                             <Loading message="Menganalisis profil & mencari rekomendasi terbaik..." />
                         ) : recommendationError ? (
-                            <ReadableText tag="p" className="text-center text-blue-700 bg-blue-100 p-4 rounded-md border border-blue-200">
+                            <ReadableText 
+                                tag="p" 
+                                className="text-center text-blue-800 bg-blue-100 p-4 rounded-md border border-blue-200"
+                                textToRead={`Pesan kesalahan rekomendasi: ${recommendationError}`}
+                            >
                                 {recommendationError}
                             </ReadableText>
                         ) : (
                             <>
                                 {recommendedCourses.length > 0 && (
                                     <div className="mb-12">
-                                        <ReadableText tag="h3" className="text-2xl font-semibold text-gray-800 mb-6 text-left md:text-center">
+                                        <ReadableText 
+                                            tag="h3" 
+                                            className="text-2xl font-semibold text-blue-800 mb-6 text-left md:text-center"
+                                            textToRead="Bagian pelatihan yang direkomendasikan khusus untuk Anda"
+                                        >
                                             Pelatihan Direkomendasikan:
                                         </ReadableText>
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
@@ -175,7 +193,11 @@ export default function HomePage() {
                                 )}
                                 {recommendedCommunities.length > 0 && (
                                     <div className="mb-6">
-                                        <ReadableText tag="h3" className="text-2xl font-semibold text-gray-800 mb-6 text-left md:text-center">
+                                        <ReadableText 
+                                            tag="h3" 
+                                            className="text-2xl font-semibold text-blue-800 mb-6 text-left md:text-center"
+                                            textToRead="Bagian komunitas yang direkomendasikan khusus untuk Anda"
+                                        >
                                             Komunitas Direkomendasikan:
                                         </ReadableText>
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
@@ -190,15 +212,27 @@ export default function HomePage() {
             )}
 
             {/* Featured Courses Section */}
-            <section className="py-16 bg-gradient-to-br from-gray-50 to-blue-50">
+            <section className="py-16 bg-gradient-to-br from-blue-50 to-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
-                        <ReadableText tag="h2" className="text-3xl font-bold text-gray-800">
+                        <ReadableText 
+                            tag="h2" 
+                            className="text-3xl font-bold text-blue-800"
+                            textToRead={
+                                (showRecommendations && (recommendedCourses.length > 0 || recommendedCommunities.length > 0)) && !recommendationError
+                                    ? "Bagian pelatihan lainnya yang tersedia"
+                                    : "Bagian pelatihan unggulan kami"
+                            }
+                        >
                             {(showRecommendations && (recommendedCourses.length > 0 || recommendedCommunities.length > 0)) && !recommendationError
                                 ? "Pelatihan Lainnya"
                                 : "Pelatihan Unggulan"}
                         </ReadableText>
-                        <ReadableText tag="p" className="text-gray-600 mt-2">
+                        <ReadableText 
+                            tag="p" 
+                            className="text-blue-700 mt-2"
+                            textToRead="Tingkatkan keahlian Anda dengan kursus pilihan kami"
+                        >
                             Tingkatkan keahlian Anda dengan kursus pilihan kami.
                         </ReadableText>
                     </div>
@@ -211,13 +245,23 @@ export default function HomePage() {
                             ))}
                         </div>
                     ) : (
-                        <ReadableText tag="p" className="text-center text-gray-500">
+                        <ReadableText 
+                            tag="p" 
+                            className="text-center text-blue-600"
+                            textToRead="Belum ada pelatihan tersedia saat ini"
+                        >
                             Belum ada pelatihan tersedia saat ini.
                         </ReadableText>
                     )}
                     <div className="text-center mt-10">
-                        <Link to="/courses" className="btn btn-outline inline-flex items-center border-blue-300 text-blue-700 hover:bg-blue-50">
-                            <ReadableText tag="span" textToRead="Lihat Semua Pelatihan">
+                        <Link 
+                            to="/courses" 
+                            className="inline-flex items-center px-6 py-3 border border-blue-300 text-base font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                        >
+                            <ReadableText 
+                                tag="span" 
+                                textToRead="Link untuk melihat semua pelatihan yang tersedia"
+                            >
                                 Lihat Semua Pelatihan
                             </ReadableText>
                             <ArrowRight size={20} className="ml-2" aria-hidden="true" />
@@ -230,12 +274,24 @@ export default function HomePage() {
             <section className="py-16 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
-                        <ReadableText tag="h2" className="text-3xl font-bold text-gray-800">
+                        <ReadableText 
+                            tag="h2" 
+                            className="text-3xl font-bold text-blue-800"
+                            textToRead={
+                                (showRecommendations && (recommendedCourses.length > 0 || recommendedCommunities.length > 0)) && !recommendationError
+                                    ? "Bagian komunitas lainnya yang tersedia"
+                                    : "Bagian komunitas populer kami"
+                            }
+                        >
                             {(showRecommendations && (recommendedCourses.length > 0 || recommendedCommunities.length > 0)) && !recommendationError
                                 ? "Komunitas Lainnya"
                                 : "Komunitas Populer"}
                         </ReadableText>
-                        <ReadableText tag="p" className="text-gray-600 mt-2">
+                        <ReadableText 
+                            tag="p" 
+                            className="text-blue-700 mt-2"
+                            textToRead="Bergabung dan berinteraksi dengan komunitas yang relevan"
+                        >
                             Bergabung dan berinteraksi dengan komunitas yang relevan.
                         </ReadableText>
                     </div>
@@ -248,13 +304,23 @@ export default function HomePage() {
                             ))}
                         </div>
                     ) : (
-                        <ReadableText tag="p" className="text-center text-gray-500">
+                        <ReadableText 
+                            tag="p" 
+                            className="text-center text-blue-600"
+                            textToRead="Belum ada komunitas tersedia saat ini"
+                        >
                             Belum ada komunitas tersedia saat ini.
                         </ReadableText>
                     )}
-                     <div className="text-center mt-10">
-                        <Link to="/communities" className="btn btn-outline inline-flex items-center border-blue-300 text-blue-700 hover:bg-blue-50">
-                            <ReadableText tag="span" textToRead="Lihat Semua Komunitas">
+                    <div className="text-center mt-10">
+                        <Link 
+                            to="/communities" 
+                            className="inline-flex items-center px-6 py-3 border border-blue-300 text-base font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                        >
+                            <ReadableText 
+                                tag="span" 
+                                textToRead="Link untuk melihat semua komunitas yang tersedia"
+                            >
                                 Lihat Semua Komunitas
                             </ReadableText>
                             <ArrowRight size={20} className="ml-2" aria-hidden="true" />
@@ -265,8 +331,22 @@ export default function HomePage() {
 
             {/* Call to Action Banner */}
             <Banner 
-                title={ <ReadableText tag="span">Siap Mengambil Langkah Berikutnya?</ReadableText> }
-                subtitle={ <ReadableText tag="span">Jadilah bagian dari RakitCita dan mulailah perjalanan Anda.</ReadableText> }
+                title={ 
+                    <ReadableText 
+                        tag="span"
+                        textToRead="Ajakan untuk mengambil langkah berikutnya"
+                    >
+                        Siap Mengambil Langkah Berikutnya?
+                    </ReadableText> 
+                }
+                subtitle={ 
+                    <ReadableText 
+                        tag="span"
+                        textToRead="Ajakan untuk bergabung dengan RakitCita dan memulai perjalanan"
+                    >
+                        Jadilah bagian dari RakitCita dan mulailah perjalanan Anda.
+                    </ReadableText> 
+                }
                 buttonText="Daftar Sekarang"
                 buttonLink="/register"
             />
