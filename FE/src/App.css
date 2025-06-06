@@ -1,0 +1,17 @@
+#root {
+  max-width: 100%; /* Biasanya 100% untuk mengambil lebar penuh viewport */
+  margin: 0 auto;
+  /* padding: 2rem; Hapus padding global jika tidak diperlukan di semua halaman */
+  text-align: center;
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif; /* Font modern */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Memastikan root mengambil tinggi minimal viewport */
+}
+
+/* Anda bisa menambahkan styling global lain di sini jika perlu */
+body {
+  margin: 0;
+  background-color: #f8f9fa; /* Warna latar belakang umum yang lembut */
+}
