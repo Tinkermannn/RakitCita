@@ -36,10 +36,13 @@ app.use(xss());
 const userRouter = require('./src/routes/user.route');
 const courseRouter = require('./src/routes/course.route');
 const communityRouter = require('./src/routes/community.route');
+const recommendationRouter = require('./src/routes/recommendation.route');
 
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/courses', courseRouter);
 app.use('/api/v1/communities', communityRouter);
+app.use('/api/v1/recommendations', recommendationRouter); // <--- BARU
+
 
 // Basic health check route
 app.get('/api/v1/health', (req, res) => {
